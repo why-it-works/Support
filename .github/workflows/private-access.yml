@@ -1,0 +1,28 @@
+name: Send GitHub Collaborator Invite from Issue
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  send-invite:
+
+    if: contains(github.event.issue.labels.*.name, 'access-request')
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 16
+
+        - name: Invite User to Private Repo
+          env:
+            TOKEN: ${{ secrets.GH_TOKEN }}
+            USERNAME: ${{ github.event.issue.user.login }}
+          run: |
+            cd scripts && npm install            
+            node invite.js $USERNAME $TOKEN
